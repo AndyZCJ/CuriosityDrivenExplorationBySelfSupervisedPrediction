@@ -5,6 +5,9 @@ Look at the original Tensorflow implementation [here](https://github.com/pathak2
 # To Train
 python3 a2c_devel.py --recurrent-policy
 
+#To test
+python3 a2c_devel.py --recurrent-policy --inference
+
 Requirements: 
 * Python 3.6
 * Numpy 
