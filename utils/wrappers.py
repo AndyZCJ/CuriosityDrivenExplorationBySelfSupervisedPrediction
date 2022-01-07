@@ -8,7 +8,7 @@ from gym.spaces.box import Box
 
 import gym_super_mario_bros
 from gym_super_mario_bros.actions import SIMPLE_MOVEMENT, COMPLEX_MOVEMENT
-from nes_py.wrappers import BinarySpaceToDiscreteSpaceEnv
+from nes_py.wrappers import JoypadSpace
 
 import os, cv2
 
@@ -54,10 +54,10 @@ def make_env_a2c_smb(env_id, seed, rank, log_dir, dim=42, stack_frames=4, adapti
         
         env = gym_super_mario_bros.make(env_id)
         env.seed(seed + rank)
-        if vid:
-            env = wrappers.Monitor(env, os.path.join(base_dir, 'video'), force=True)
+        #if vid:
+        env = wrappers.Monitor(env, os.path.join(base_dir, 'video'), force=True)
 
-        env = BinarySpaceToDiscreteSpaceEnv(env, COMPLEX_MOVEMENT)
+        env = JoypadSpace(env, COMPLEX_MOVEMENT)
 
         if log_dir is not None:
             env = bench.Monitor(env, os.path.join(log_dir, str(rank)))

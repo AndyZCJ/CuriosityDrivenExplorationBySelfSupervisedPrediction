@@ -1,16 +1,16 @@
-import os, csv, random
+import os, csv
 import numpy as np
 
 import torch
 import torch.optim as optim
 import torch.nn as nn
 import torch.nn.functional as F
-
+import math
 from agents.A2C import Model as A2C_Model
 from networks.networks import ActorCriticSMB
 from networks.special_units import IC_Features, IC_ForwardModel_Head, IC_InverseModel_Head
 from utils.RolloutStorage import RolloutStorage
-
+import random
 from timeit import default_timer as timer
 
 class Model(A2C_Model):
@@ -89,8 +89,12 @@ class Model(A2C_Model):
           
             icm_obs_pred = self.icm_get_forward_outp(phi[:-1*self.config.num_agents], rollout.actions.view(-1, 1)[start:end])
             obs_diff = icm_obs_pred - phi[self.config.num_agents:]
-            intr_reward = obs_diff.pow(2).sqrt().sum(dim=1) * self.config.icm_prediction_beta
-            
+            print(obs_diff.pow(2).sqrt().sum(dim=1))
+            #intr_reward = torch.sin(obs_diff.pow(2).sqrt().sum(dim=1))
+            #if obs_diff.mean()>0:
+            intr_reward = self.config.icm_prediction_beta/(obs_diff.pow(2).sqrt().sum(dim=1))
+            #else:
+            #    intr_reward = obs_diff.pow(2).sqrt().sum(dim=1)*self.config.icm_prediction_beta
             all_intr_reward[start:end] = intr_reward.view(-1, 1)
         
         rollout.rewards += all_intr_reward.view(num_steps, num_processes, 1)

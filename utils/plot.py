@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import os
 import glob
 from scipy.signal import medfilt
-
+import pandas as pd
 def smooth_reward_curve(x, y):
     # Halfwidth of our smoothing convolution
     halfwidth = min(31, int(np.ceil(len(x) / 30)))
@@ -354,13 +354,13 @@ def load_raw_reward_data(indir, smooth, bin_size):
 
     for inf in infiles:
         with open(inf, 'r') as f:
-            f.readline()
-            f.readline()
-            for line in f:
-                tmp = line.split(',')
-                t_time = float(tmp[2])
-                tmp = [t_time, int(tmp[1]), float(tmp[0])]
-                datas.append(tmp)
+            line = f.readlines()[-2]
+            tmp = line.split(',')
+            if len(tmp)>=2:
+                if tmp[0] != "r":
+                    t_time = float(tmp[2])
+                    tmp = [t_time, int(tmp[1]), float(tmp[0])]
+                    datas.append(tmp)
 
     datas = sorted(datas, key=lambda d_entry: d_entry[0])
     result = []
@@ -383,14 +383,15 @@ def load_raw_eplength_data(indir, smooth, bin_size):
     infiles = glob.glob(os.path.join(indir, '*.monitor.csv'))
 
     for inf in infiles:
+        print(inf)
         with open(inf, 'r') as f:
-            f.readline()
-            f.readline()
-            for line in f:
-                tmp = line.split(',')
-                t_time = float(tmp[2])
-                tmp = [t_time, int(tmp[1]), float(tmp[0])]
-                datas.append(tmp)
+            line = f.readlines()[-2]
+            tmp = line.split(',')
+            if len(tmp) >= 2:
+                if tmp[0]!="r":
+                    t_time = float(tmp[2])
+                    tmp = [t_time, int(tmp[1]), float(tmp[0])]
+                    datas.append(tmp)
 
     datas = sorted(datas, key=lambda d_entry: d_entry[0])
     result = []
@@ -407,11 +408,15 @@ def load_raw_eplength_data(indir, smooth, bin_size):
     return x, y
     
 def tb_plot_from_monitor(tb_writer, log_dir, action_repeat, last_reward_logged, data='reward'):
+    x=0
+    y=0
+    tmp=0
     if data=='reward':
         x, y = load_raw_reward_data(log_dir, 1, 1) #load data
     elif data == 'episode length':
         x, y = load_raw_eplength_data(log_dir, 1, 1) #load data
-    tmp = x.size #store last logged for later
+    if x is not None:
+        tmp = x.size #store last logged for later
     
     if x is not None and y is not None:
         #preprocess

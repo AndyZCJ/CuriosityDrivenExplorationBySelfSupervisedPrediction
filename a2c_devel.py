@@ -35,7 +35,7 @@ parser.add_argument('--dim', type=int, default=84,
                     help='Dimensionality (h and w) of preprocessed frames (default: 42)')
 parser.add_argument('--reward-type', type=str, default='none',
                     choices=('none', 'sparse', 'dense'),
-					help='Type of reward. Choices = {none, sparse, dense}. (default: none))')
+					help='Type of reward. Choices = {none, sparse, dense}. (default: sparse))')
 parser.add_argument('--stack-frames', type=int, default=4,
 					help='Number of frames to stack (default: 4)')
 parser.add_argument('--adaptive-repeat', nargs='+', type=int, default=[4],
@@ -52,8 +52,8 @@ parser.add_argument('--lr', type=float, default=1e-4,
 					help='learning rate (default: 1e-4)')
 parser.add_argument('--gamma', type=float, default=0.9,
 					help='discount factor for rewards (default: 0.99)')
-parser.add_argument('--num-frames', type=int, default=5e6,
-					help='number of frames to train (default: 1e6)')
+parser.add_argument('--num-frames', type=int, default=1e7,
+					help='number of frames to train (default: 2e6)')
 parser.add_argument('--num-steps', type=int, default=50,
 					help='number of forward steps in A2C (default: 50)')
 parser.add_argument('--num-processes', type=int, default=6,
@@ -315,7 +315,7 @@ def test(config):
     if torch.cuda.is_available():
         torch.cuda.manual_seed(seed)
 
-    env = [make_env_a2c_smb(config.env_id, seed, config.num_agents+1, log_dir, dim=args.dim, stack_frames=config.stack_frames, adaptive_repeat=config.adaptive_repeat, reward_type=config.reward_type, sticky=args.sticky_actions, vid=args.render, base_dir=base_dir)]
+    env = [make_env_a2c_smb(config.env_id, seed, config.num_agents+1, log_dir, dim=args.dim, stack_frames=config.stack_frames, adaptive_repeat=config.adaptive_repeat, reward_type=config.reward_type, sticky=args.sticky_actions, vid=True, base_dir=base_dir)]
     env = SubprocVecEnv(env)
 
 
